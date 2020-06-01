@@ -14,3 +14,4 @@
 # Dependency directories (remove the comment below to include it)
 # vendor/
 example/ReactOS-0.3.17-REL-iso.zip
+*.tmp.*
