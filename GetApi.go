@@ -126,14 +126,22 @@ func (api *StructAPI) Download(min int, max int, i int, url string, body []strin
 	}
 	body[i] = string(reader)
 	fn := filename + ".tmp." + strconv.Itoa(i)
-	api.Create(fn)
+	fs, err := api.Create(fn)
+	if err != nil {
+		pc, fn, line, ok := runtime.Caller(1)
+		details := runtime.FuncForPC(pc)
+		if ok && details != nil {
+			fmt.Printf("called from %s\n, function %s line %d :error %s", details.Name(), fn, line, err)
+		}
+		return false
+	}
+	defer fs.Close()
 	file, err := os.OpenFile(fn, os.O_WRONLY, 0666)
 	if err != nil {
 		pc, fn, line, ok := runtime.Caller(1)
 		details := runtime.FuncForPC(pc)
 		if ok && details != nil {
 			fmt.Printf("called from %s\n, function %s line %d :error %s", details.Name(), fn, line, err)
-
 		}
 		return false
 	}
