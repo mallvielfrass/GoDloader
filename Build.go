@@ -6,7 +6,8 @@ import (
 	"strconv"
 )
 
-func (api *API) Build(name string, lim int) bool {
+//Build собирает все части файла в один
+func (api *StructAPI) Build(name string, lim int) bool {
 	for i := 0; i < lim; i++ {
 		file, err := os.Open(name + ".tmp." + strconv.Itoa(i))
 		if err != nil {
@@ -20,17 +21,13 @@ func (api *API) Build(name string, lim int) bool {
 			return false
 		}
 
-		// чтение файла
+		// читаем часть
 		bs := make([]byte, stat.Size())
 		_, err = file.Read(bs)
 		if err != nil {
 			return false
 		}
-
-		//	str := string(bs)
-		//fmt.Println(str)
-		api.Stick(name, bs)
-
+		api.Stick(name, bs) //приклеиваем к целевому файлу
 	}
-	return true
+	return true //если сборка прошла успешно, то возвращается true, иначе вернется false и можно будет обработать эту ошибку
 }
