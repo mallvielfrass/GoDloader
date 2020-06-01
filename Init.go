@@ -26,7 +26,7 @@ func (api *StructAPI) ExtErr(err error) bool {
 
 	}
 	return false
-	//fmt.Println("fn", fn, " line ", line)
+
 }
 
 //StructAPI главная структура апи. можно указать максимальное количество потоков

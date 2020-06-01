@@ -76,7 +76,6 @@ func (api *StructAPI) GetAPI(url string, filename string) (int, string, int, boo
 		}
 
 		go func(min int, max int, i int, url string) {
-			//fmt.Printf("run thread %d\n", i)
 			for {
 				_, err := http.Head(url)
 				if err != nil {

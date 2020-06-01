@@ -18,8 +18,8 @@ func main() {
 	url := "http://localhost:8100/static/ReactOS/ReactOS-0.3.17-REL-iso.zip" //run ../SeverForTest/server.go on port 8100
 	s := strings.Split(url, "/")
 	fmt.Printf("File ReactOS-0.4.13-iso.zip  %t was deleted\n", api.RemoveSimple("./"+s[len(s)-1]))
-	//md5File := "3cc4988d6536e53b48eda5736147a457"
-	md5File := "" //если имеется md5, используйте его. если он пустой, то будет проверяться длинна файла
+	md5File := "3cc4988d6536e53b48eda5736147a457"
+	//md5File := "" //если имеется md5, используйте его. если он пустой, то будет проверяться длинна файла
 	lim, name, length, status := api.Get(url)
 	if status != false {
 		fmt.Printf("%d %s \n", lim, name)
