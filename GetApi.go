@@ -8,16 +8,17 @@ import (
 	"os"
 	"runtime"
 	"strconv"
-	"sync"
 	"time"
+
+	"github.com/remeh/sizedwaitgroup"
 )
 
-var wg sync.WaitGroup
-var defaultLim = 5
+//var wg sync.WaitGroup
 
 //GetAPI получает готовую ссылку и имя файла от функций Get и GetAll, рассчитывает количество получившихся частей и загружает
 func (api *StructAPI) GetAPI(url string, filename string) (int, string, int, bool) {
 	//file := "http://localhost:8100/pinn-lite%281%29.zip"
+
 	_, err := http.Head(url)
 	if err != nil {
 		pc, fn, line, ok := runtime.Caller(1)
@@ -37,41 +38,45 @@ func (api *StructAPI) GetAPI(url string, filename string) (int, string, int, boo
 	length, _ := strconv.Atoi(maps["Content-Length"][0]) // Get the content length from the header request
 	//fmt.Println(length)
 	//	var a int = 646646464
-	var b int = 32768
-	var s int = length / b
-	var limit int
-	//проверка размера файла чтобы не резать на слишком мелкие куски
-	switch s {
-	case 0:
-		limit = 1
+	var b int
+	var MinBlockSizeLimit int = 32768
+	if api.BlockSizeLimit < MinBlockSizeLimit {
+		b = MinBlockSizeLimit
+	} else {
 
-	case 1:
-		limit = 2
-
-	case 2:
-		limit = 3
-
-	default:
-		limit = defaultLim
-
+		b = api.BlockSizeLimit
 	}
-	//fmt.Println(limit)
+	//	var s int = length / b
 
-	lenSub := length / limit   // Bytes for each Go-routine
-	diff := length % limit     // Get the remaining for the last request
-	body := make([]string, 11) // Make up a temporary array to hold the data to be written to the file
-	for i := 0; i < limit; i++ {
-		wg.Add(1)
+	lenSub := length / b           // Bytes for each Go-routine
+	diff := length % b             // Get the remaining for the last request
+	body := make([]string, lenSub) // Make up a temporary array to hold the data to be written to the file
+	var DownloadThreads int
+	//	fmt.Printf("block size  : %d\n ", b)
+	//	fmt.Printf("lensub size  : %d\n ", lenSub)
+	//	if lenSub < api.ThreadLimit {
 
-		min := lenSub * i       // Min range
-		max := lenSub * (i + 1) // Max range
+	//		DownloadThreads = lenSub
 
-		if i == limit-1 {
+	//	} else {
+	DownloadThreads = api.ThreadLimit
+
+	//	}
+	//fmt.Printf("downloads th : %d\n ", DownloadThreads)
+	var wg = sizedwaitgroup.New(DownloadThreads)
+	th := lenSub
+	for i := 0; i < th; i++ {
+		wg.Add()
+
+		min := b * i       // Min range
+		max := b * (i + 1) // Max range
+		//	fmt.Printf("%d %d %d\n", i, min, max)
+		if i == th-1 {
 			max += diff // Add the remaining bytes in the last request
 		}
 
 		go func(min int, max int, i int, url string) {
-
+			//fmt.Printf("run thread %d\n", i)
 			for {
 				_, err := http.Head(url)
 				if err != nil {
@@ -94,7 +99,7 @@ func (api *StructAPI) GetAPI(url string, filename string) (int, string, int, boo
 	}
 
 	wg.Wait()
-	return limit, filename, length, true
+	return th, filename, length, true
 }
 
 //Download загружает часть

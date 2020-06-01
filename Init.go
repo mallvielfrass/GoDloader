@@ -31,12 +31,14 @@ func (api *StructAPI) ExtErr(err error) bool {
 
 //StructAPI главная структура апи. можно указать максимальное количество потоков
 type StructAPI struct {
-	ThreadLimit int
+	ThreadLimit    int
+	BlockSizeLimit int
 }
 
 //API точка входа в lib
-func API(ThreadLimit int) *StructAPI {
+func API(ThreadLimit int, BlockSizeLimit int) *StructAPI {
 	return &StructAPI{
-		ThreadLimit: ThreadLimit,
+		ThreadLimit:    ThreadLimit,
+		BlockSizeLimit: BlockSizeLimit,
 	}
 }

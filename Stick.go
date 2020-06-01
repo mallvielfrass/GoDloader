@@ -26,10 +26,10 @@ func (api *StructAPI) Stick(pathFileLog string, insertData []byte) {
 		}
 	}()
 	//	insertData := []byte("test")
-	countN, err := fileLog.Write(insertData)
+	_, err = fileLog.Write(insertData)
 	if err != nil {
 		log.Fatalln(err)
 	}
-	log.Println("log countN:", countN)
+	//	log.Println("log countN:", countN)
 
 }

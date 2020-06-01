@@ -11,8 +11,9 @@ import (
 
 func main() {
 
-	ThreadLimit := 5
-	api := godloader.API(ThreadLimit)
+	ThreadLimit := 8
+	BlockSizeLimit := 5242880 //5MB one part
+	api := godloader.API(ThreadLimit, BlockSizeLimit)
 	//api.GetAll("http://localhost:8100/static/testolde/parse/pinn-lite%281%29.zip")
 	url := "http://localhost:8100/static/ReactOS/ReactOS-0.3.17-REL-iso.zip" //run ../SeverForTest/server.go on port 8100
 	s := strings.Split(url, "/")
